@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Step;
 
 public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder> {
@@ -17,16 +18,30 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     private List<Step> dataList;
     private Context context;
 
-    public StepAdapter(Context context, List<Step> dataList) {
-        this.context = context;
-        this.dataList = dataList;
+    private final StepAdapterOnClickHandler mClickHandler;
+
+    public interface StepAdapterOnClickHandler{
+        void onClick(Step selectedStep);
     }
 
-    public class StepViewHolder extends RecyclerView.ViewHolder {
+    public StepAdapter(Context context, List<Step> dataList, StepAdapterOnClickHandler mClickHandler) {
+        this.context = context;
+        this.dataList = dataList;
+        this.mClickHandler = mClickHandler;
+    }
+
+    public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView stepShortDescriptionTextView;
         public StepViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             stepShortDescriptionTextView = itemView.findViewById(R.id.tv_stepShortDescription);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int adapterPosition = getAdapterPosition();
+            mClickHandler.onClick(dataList.get(adapterPosition));
         }
     }
 

@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.network;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

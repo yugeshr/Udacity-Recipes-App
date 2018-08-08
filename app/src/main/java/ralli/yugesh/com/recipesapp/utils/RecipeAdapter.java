@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.RecipeList;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>{

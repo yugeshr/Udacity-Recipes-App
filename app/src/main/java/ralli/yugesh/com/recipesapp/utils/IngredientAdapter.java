@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.List;
+
+import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Ingredient;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {

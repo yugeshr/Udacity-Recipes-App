@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.network;
 
 import java.util.List;
 import ralli.yugesh.com.recipesapp.model.RecipeList;
