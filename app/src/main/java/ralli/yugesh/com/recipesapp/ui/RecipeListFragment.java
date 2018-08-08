@@ -1,9 +1,11 @@
 package ralli.yugesh.com.recipesapp.ui;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,11 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.bumptech.glide.annotation.GlideModule;
+
+import java.io.Serializable;
 import java.util.List;
 import ralli.yugesh.com.recipesapp.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ralli.yugesh.com.recipesapp.model.Ingredient;
+import ralli.yugesh.com.recipesapp.model.Step;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -75,6 +83,18 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
 
     @Override
     public void onClick(RecipeList selectedRecipe) {
-        Toast.makeText(getContext(),"Clicked "+selectedRecipe.getName(),Toast.LENGTH_SHORT).show();
+        List<Ingredient> ingredientList = selectedRecipe.getIngredients();
+        List<Step> stepList = selectedRecipe.getSteps();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("ingredients", (Serializable) ingredientList);
+        bundle.putSerializable("steps",(Serializable) stepList);
+        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.container,recipeDetailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
