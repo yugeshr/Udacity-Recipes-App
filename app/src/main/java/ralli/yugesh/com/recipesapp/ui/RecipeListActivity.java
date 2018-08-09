@@ -1,37 +1,33 @@
 package ralli.yugesh.com.recipesapp.ui;
 
-import android.os.Bundle;
+import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.List;
-import ralli.yugesh.com.recipesapp.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Ingredient;
+import ralli.yugesh.com.recipesapp.model.RecipeList;
 import ralli.yugesh.com.recipesapp.model.Step;
+import ralli.yugesh.com.recipesapp.network.RecipeApi;
+import ralli.yugesh.com.recipesapp.network.RecipeService;
+import ralli.yugesh.com.recipesapp.utils.RecipeAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import ralli.yugesh.com.recipesapp.utils.RecipeAdapter;
-import ralli.yugesh.com.recipesapp.network.RecipeApi;
-import ralli.yugesh.com.recipesapp.network.RecipeService;
-import ralli.yugesh.com.recipesapp.model.RecipeList;
 
-
-public class RecipeListFragment extends Fragment implements RecipeAdapter.RecipeAdapterOnClickHandler {
+public class RecipeListActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickHandler{
 
     @BindView(R.id.rv_recipesView)
     RecyclerView recipesRecyclerView;
@@ -39,18 +35,15 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
     private RecipeAdapter recipeAdapter;
     private String TAG = "Log";
 
-    public RecipeListFragment(){
 
-    }
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recipelist,container,false);
-        ButterKnife.bind(this,view);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recipe_list);
+
+        ButterKnife.bind(this);
 
         getRecipes();
-
-        return view;
     }
 
     private void getRecipes() {
@@ -66,14 +59,14 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
             @Override
             public void onFailure(Call<List<RecipeList>> call, Throwable t) {
                 Log.d(TAG,t.getMessage());
-                Toast.makeText(getContext(),"Error Occurred, Try again later!",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Error Occurred, Try again later!",Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void generateRecipeList(List<RecipeList> recipeList) {
-        recipeAdapter = new RecipeAdapter(getContext(),recipeList,this);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recipeAdapter = new RecipeAdapter(getApplicationContext(),recipeList,this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recipesRecyclerView.setLayoutManager(layoutManager);
         recipesRecyclerView.setAdapter(recipeAdapter);
     }
@@ -89,20 +82,14 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
         bundle.putSerializable("steps",(Serializable) stepList);
         bundle.putString("title",title);
 
-        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
-        recipeDetailFragment.setArguments(bundle);
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        getActivity().setTitle(title);
-        fragmentManager.beginTransaction()
-                .replace(R.id.container,recipeDetailFragment)
-                .addToBackStack(null)
-                .commit();
+        Intent intent = new Intent(getApplicationContext(),RecipeDetailActivity.class);
+        intent.putExtra("bundle",bundle);
+        startActivity(intent);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle currentState) {
         super.onSaveInstanceState(currentState);
-
 
     }
 }
