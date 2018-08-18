@@ -2,6 +2,7 @@ package ralli.yugesh.com.recipesapp.ui;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Parcelable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -86,6 +89,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
 
         bundle = new Bundle();
         bundle.putSerializable("steps",selectedStep);
+        bundle.putSerializable("stepsList", (Serializable) stepList);
         bundle.putString("title",mTitle);
 
         int orientation = getResources().getConfiguration().orientation;
