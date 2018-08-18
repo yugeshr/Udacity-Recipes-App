@@ -1,14 +1,17 @@
 package ralli.yugesh.com.recipesapp.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.ScrollView;
 
 import java.util.List;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,17 +23,26 @@ import ralli.yugesh.com.recipesapp.utils.StepAdapter;
 
 public class RecipeDetailActivity extends AppCompatActivity implements StepAdapter.StepAdapterOnClickHandler{
 
+    private static final String TAG = "RecipeDetailActivity";
     @BindView(R.id.rv_recipeIngredientsView)
     RecyclerView recipeIngredientsRecyclerView;
 
     @BindView(R.id.rv_recipeStepsView)
     RecyclerView recipeStepsRecyclerView;
 
+    ScrollView scrollView;
+
+    private FragmentManager fragmentManager;
+    private RecipeStepFragment  recipeStepFragment;
+
     private IngredientAdapter ingredientAdapter;
     private StepAdapter stepAdapter;
 
+    private String mTitle;
     List<Ingredient> ingredientList;
     List<Step> stepList;
+
+    Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +60,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
 
         ingredientList = (List<Ingredient>) bundle.getSerializable("ingredients");
         stepList = (List<Step>) bundle.getSerializable("steps");
-/*        String title = bundle.getString("title");
-        setTitle(title);*/
 
+        mTitle = bundle.getString("title");
+        setTitle(mTitle);
         setIngredients(ingredientList);
         setSteps(stepList);
     }
@@ -71,11 +83,40 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
 
     @Override
     public void onClick(Step selectedStep) {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("steps",selectedStep);
 
-        Intent intent = new Intent(getApplicationContext(),RecipeStepActivity.class);
-        intent.putExtra("bundle",bundle);
-        startActivity(intent);
+        bundle = new Bundle();
+        bundle.putSerializable("steps",selectedStep);
+        bundle.putString("title",mTitle);
+
+        int orientation = getResources().getConfiguration().orientation;
+
+        if (orientation == Configuration.ORIENTATION_PORTRAIT ){
+            Log.d(TAG,"Configuration.ORIENTATION_PORTRAIT");
+            scrollView = findViewById(R.id.sv_recipedetail);
+            scrollView.setVisibility(View.INVISIBLE);
+
+            Intent intent = new Intent(this,RecipeStepActivity.class);
+            intent.putExtra("bundle",bundle);
+            startActivity(intent);
+
+        }else {
+            Log.d(TAG,"Configuration.ORIENTATION_LANDSCAPE");
+            recipeStepFragment = new RecipeStepFragment();
+            recipeStepFragment.setArguments(bundle);
+            fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.recipeStepContainer,recipeStepFragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT ){
+            scrollView = findViewById(R.id.sv_recipedetail);
+            scrollView.setVisibility(View.VISIBLE);
+        }
+        super.onResume();
     }
 }

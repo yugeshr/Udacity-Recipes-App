@@ -2,7 +2,6 @@ package ralli.yugesh.com.recipesapp.ui;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +33,8 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
 
     private RecipeAdapter recipeAdapter;
     private String TAG = "Log";
+
+    Bundle bundle;
 
 
     @Override
@@ -77,7 +78,7 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
         List<Ingredient> ingredientList = selectedRecipe.getIngredients();
         List<Step> stepList = selectedRecipe.getSteps();
 
-        Bundle bundle = new Bundle();
+        bundle = new Bundle();
         bundle.putSerializable("ingredients", (Serializable) ingredientList);
         bundle.putSerializable("steps",(Serializable) stepList);
         bundle.putString("title",title);

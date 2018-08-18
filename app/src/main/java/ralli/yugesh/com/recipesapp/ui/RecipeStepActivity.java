@@ -7,6 +7,9 @@ import ralli.yugesh.com.recipesapp.R;
 
 public class RecipeStepActivity extends AppCompatActivity {
 
+    private FragmentManager fragmentManager;
+    private RecipeStepFragment  recipeStepFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,12 +22,12 @@ public class RecipeStepActivity extends AppCompatActivity {
             throw new IllegalArgumentException("Activity cannot find  extras bundle");
         }
 
-        RecipeStepFragment  recipeStepFragment = new RecipeStepFragment();
+        setTitle(bundle.getString("title"));
+        recipeStepFragment = new RecipeStepFragment();
         recipeStepFragment.setArguments(bundle);
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.recipeStepContainer,recipeStepFragment)
-                .addToBackStack(null)
                 .commit();
     }
 }

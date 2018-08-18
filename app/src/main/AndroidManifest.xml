@@ -19,7 +19,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.RecipeDetailActivity" />
-        <activity android:name=".ui.RecipeStepActivity"></activity>
+        <activity android:name=".ui.RecipeStepActivity" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

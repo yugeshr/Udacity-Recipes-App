@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -32,10 +33,15 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
     public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView stepShortDescriptionTextView;
+        TextView stepIdTextView;
+        ImageView stepOpenView;
+
         public StepViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             stepShortDescriptionTextView = itemView.findViewById(R.id.tv_stepShortDescription);
+            stepIdTextView = itemView.findViewById(R.id.tv_stepId);
+            stepOpenView = itemView.findViewById(R.id.iv_stepOpen);
         }
 
         @Override
@@ -55,7 +61,9 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull StepViewHolder holder, int position) {
-        String stepShortDescriptionString = dataList.get(position).getId() +"."+ dataList.get(position).getShortDescription();
+        String stepIdString = dataList.get(position).getId() +".";
+        String stepShortDescriptionString = dataList.get(position).getShortDescription();
+        holder.stepIdTextView.setText(stepIdString);
         holder.stepShortDescriptionTextView.setText(stepShortDescriptionString);
     }
 
