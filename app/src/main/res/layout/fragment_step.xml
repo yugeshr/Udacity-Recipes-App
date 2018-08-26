@@ -8,19 +8,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/exoPlayerView"
+        <FrameLayout
+            android:id="@+id/frame"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="10dp"
-            android:paddingEnd="10dp"
-            android:paddingStart="10dp"/>
+            android:layout_height="wrap_content">
+
+            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+                android:id="@+id/exoPlayerView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="10dp"
+                android:paddingEnd="10dp"
+                android:paddingStart="10dp"/>
+
+        </FrameLayout>
+
 
         <TextView
             android:id="@+id/tv_stepDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/exoPlayerView"
+            android:layout_below="@id/frame"
             android:padding="10dp"
             android:layout_margin="10dp"
             android:textColor="@color/colorBlack"

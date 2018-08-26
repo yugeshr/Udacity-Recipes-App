@@ -1,5 +1,8 @@
 package ralli.yugesh.com.recipesapp.ui;
 
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Parcelable;
@@ -9,6 +12,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
 
@@ -19,6 +24,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ralli.yugesh.com.recipesapp.R;
+import ralli.yugesh.com.recipesapp.RecipeWidgetProvider;
 import ralli.yugesh.com.recipesapp.model.Ingredient;
 import ralli.yugesh.com.recipesapp.model.Step;
 import ralli.yugesh.com.recipesapp.utils.IngredientAdapter;
@@ -27,6 +33,8 @@ import ralli.yugesh.com.recipesapp.utils.StepAdapter;
 public class RecipeDetailActivity extends AppCompatActivity implements StepAdapter.StepAdapterOnClickHandler{
 
     private static final String TAG = "RecipeDetailActivity";
+    private static String ACTION_RECIPEWIDGET = "ACTION_RECIPEWIDGET";
+
     @BindView(R.id.rv_recipeIngredientsView)
     RecyclerView recipeIngredientsRecyclerView;
 
@@ -95,16 +103,16 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
         int orientation = getResources().getConfiguration().orientation;
 
         if (orientation == Configuration.ORIENTATION_PORTRAIT ){
-            Log.d(TAG,"Configuration.ORIENTATION_PORTRAIT");
             scrollView = findViewById(R.id.sv_recipedetail);
             scrollView.setVisibility(View.INVISIBLE);
+
+            bundle.putBoolean("flag",true);
 
             Intent intent = new Intent(this,RecipeStepActivity.class);
             intent.putExtra("bundle",bundle);
             startActivity(intent);
 
         }else {
-            Log.d(TAG,"Configuration.ORIENTATION_LANDSCAPE");
             recipeStepFragment = new RecipeStepFragment();
             recipeStepFragment.setArguments(bundle);
             fragmentManager = getSupportFragmentManager();
@@ -122,5 +130,34 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
             scrollView.setVisibility(View.VISIBLE);
         }
         super.onResume();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_add){
+            bundle = new Bundle();
+            bundle.putString("recipeName",mTitle);
+            bundle.putSerializable("ingredients", (Serializable) ingredientList);
+
+            Intent intent = new Intent(getApplicationContext(), RecipeWidgetProvider.class);
+            intent.putExtra("bundle",bundle);
+            intent.setAction(ACTION_RECIPEWIDGET);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(),0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            try {
+                pendingIntent.send(getApplicationContext(),0,intent);
+            } catch (PendingIntent.CanceledException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 }

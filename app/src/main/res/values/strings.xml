@@ -3,4 +3,7 @@
     <string name="icon">icon</string>
     <string name="ingredients">Ingredients:</string>
     <string name="step_open_icon">Step open icon</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="add_to_widget">Add to widget</string>
 </resources>

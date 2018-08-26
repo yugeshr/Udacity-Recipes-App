@@ -18,19 +18,21 @@ import ralli.yugesh.com.recipesapp.ui.RecipeStepFragment;
 public class StepStatePagerAdapter extends FragmentStatePagerAdapter {
 
     private List<Step> steps;
-    private Bundle bundle;
+    private Boolean flag;
     private RecipeStepFragment recipeStepFragment;
 
-    public StepStatePagerAdapter(FragmentManager fm, List<Step> steps,Bundle bundle) {
+    public StepStatePagerAdapter(FragmentManager fm, List<Step> steps,Boolean flag) {
         super(fm);
         this.steps = steps;
-        this.bundle = bundle;
+        this.flag = flag;
     }
 
     @Override
     public Fragment getItem(int position) {
         Log.d("Adapter", String.valueOf(position));
+        Bundle bundle = new Bundle();
         bundle.putSerializable("steps",steps.get(position));
+        bundle.putBoolean("flag",flag);
         return RecipeStepFragment.newInstance(bundle);
     }
 

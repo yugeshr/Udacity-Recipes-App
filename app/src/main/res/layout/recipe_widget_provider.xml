@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#09C"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_recipe_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:text="RecipeName"
+        tools:text="Nutella Pie"/>
+
+    <ListView
+        android:padding="8dp"
+        android:layout_below="@id/widget_recipe_name"
+        android:id="@+id/widget_ingredients_container"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/widget_ingredients_list_item">
+    </ListView>
+
+</RelativeLayout>
