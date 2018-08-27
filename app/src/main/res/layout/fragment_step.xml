@@ -12,10 +12,10 @@
             android:id="@+id/tv_stepTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_margin="10dp"
-            android:textColor="@color/colorBlack"
-            android:background="@color/colorPrimaryLight"/>
+            android:background="@color/colorPrimaryLight"
+            android:padding="10dp"
+            android:textColor="@color/colorBlack" />
 
         <FrameLayout
             android:layout_below="@id/tv_stepTitle"
@@ -39,10 +39,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/frame"
-            android:padding="10dp"
             android:layout_margin="10dp"
+            android:background="@color/colorPrimaryLight"
+            android:padding="10dp"
+            android:textColor="@color/colorBlack" />
+
+        <Button
+            android:id="@+id/btn_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_stepDescription"
+            android:layout_margin="10dp"
+            android:layout_toStartOf="@id/btn_next"
+            android:background="@color/colorPrimaryLight"
+            android:gravity="center_horizontal"
+            android:padding="10dp"
+            android:text="@string/previous"
             android:textColor="@color/colorBlack"
-            android:background="@color/colorPrimaryLight"/>
+            android:textSize="16sp"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tv_stepDescription"
+            android:layout_margin="10dp"
+            android:background="@color/colorPrimaryLight"
+            android:gravity="center_horizontal"
+            android:padding="10dp"
+            android:text="@string/next"
+            android:textColor="@color/colorBlack"
+            android:textSize="16sp"
+            android:visibility="visible"/>
 
     </RelativeLayout>
 

@@ -5,4 +5,6 @@
     <string name="step_open_icon">Step open icon</string>
     <string name="add_to_widget">Add to widget</string>
     <string name="recipename">RecipeName</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
 </resources>

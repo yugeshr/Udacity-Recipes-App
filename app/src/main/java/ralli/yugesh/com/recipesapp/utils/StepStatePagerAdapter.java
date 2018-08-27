@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class StepStatePagerAdapter extends FragmentStatePagerAdapter {
         Bundle bundle = new Bundle();
         bundle.putSerializable("steps",steps.get(position));
         bundle.putBoolean("flag",flag);
+        bundle.putInt("size",steps.size());
         return RecipeStepFragment.newInstance(bundle);
     }
 

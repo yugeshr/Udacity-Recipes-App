@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -28,6 +27,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Step;
 import timber.log.Timber;
@@ -42,6 +42,12 @@ public class RecipeStepFragment extends Fragment {
 
     @BindView(R.id.tv_stepTitle)
     TextView titleTextView;
+
+    @BindView(R.id.btn_previous)
+    Button btnPrevious;
+
+    @BindView(R.id.btn_next)
+    Button btnNext;
 
     private String stepVideoUrl;
     private static final String CURRENT_POSITION = "current_position";
@@ -58,6 +64,7 @@ public class RecipeStepFragment extends Fragment {
     private String stepTitle;
     private int stepId;
     private boolean back;
+    private int stepSize;
 
     public RecipeStepFragment(){
 
@@ -81,6 +88,7 @@ public class RecipeStepFragment extends Fragment {
         stepTitle = step.getShortDescription();
         stepId = step.getId();
 
+        stepSize = getArguments().getInt("size");
         flag = getArguments().getBoolean("flag");
 
         ButterKnife.bind(this,view);
@@ -88,7 +96,6 @@ public class RecipeStepFragment extends Fragment {
 
         if (!stepVideoUrl.equals("")){
             mPlayerView.setVisibility(View.VISIBLE);
-            initializeMediaSession();
             initializePlayer();
         }else {
             //Video missing
@@ -101,6 +108,27 @@ public class RecipeStepFragment extends Fragment {
         back = true;
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
+        if (stepId==stepSize-1){
+            btnNext.setVisibility(View.GONE);
+        }
+
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((RecipeStepActivity) getActivity()).setCurrentItem(stepId+1,true);
+            }
+        });
+
+        if (stepId==0){
+            btnPrevious.setVisibility(View.GONE);
+        }
+
+        btnPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((RecipeStepActivity) getActivity()).setCurrentItem(stepId-1,true);
+            }
+        });
         return view;
     }
 
@@ -120,43 +148,6 @@ public class RecipeStepFragment extends Fragment {
             MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             mPlayer.prepare(mediaSource);
         }
-    }
-
-    private void initializeMediaSession() {
-        MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(getContext(), "media");
-        mediaSessionCompat.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
-                        | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        mediaSessionCompat.setMediaButtonReceiver(null);
-
-        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY
-                                | PlaybackStateCompat.ACTION_PAUSE
-                                | PlaybackStateCompat.ACTION_PLAY_PAUSE
-                                | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
-
-        mediaSessionCompat.setPlaybackState(stateBuilder.build());
-        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback() {
-
-            @Override
-            public void onPlay() {
-                mPlayer.setPlayWhenReady(true);
-
-            }
-
-            @Override
-            public void onPause() {
-                mPlayer.setPlayWhenReady(false);
-            }
-
-            @Override
-            public void onSkipToPrevious() {
-                mPlayer.seekTo(0);
-            }
-        });
-        mediaSessionCompat.setActive(true);
     }
 
     private void releasePlayer() {

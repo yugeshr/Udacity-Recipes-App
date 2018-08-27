@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class RecipeStepActivity extends FragmentActivity {
         pagerAdapter = new StepStatePagerAdapter(getSupportFragmentManager(),stepList,flag);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(selectedStep.getId());
-        viewPager.setOffscreenPageLimit(1);
+        viewPager.setOffscreenPageLimit(3);
         //tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -64,5 +65,9 @@ public class RecipeStepActivity extends FragmentActivity {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             //tabLayout.setVisibility(View.GONE);
         }
+    }
+
+    public void setCurrentItem (int item, boolean smoothScroll) {
+        viewPager.setCurrentItem(item, smoothScroll);
     }
 }

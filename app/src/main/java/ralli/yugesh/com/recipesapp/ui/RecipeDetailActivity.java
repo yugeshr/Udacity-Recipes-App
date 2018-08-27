@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ScrollView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import butterknife.BindView;
