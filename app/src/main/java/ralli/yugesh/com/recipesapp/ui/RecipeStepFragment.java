@@ -1,31 +1,20 @@
 package ralli.yugesh.com.recipesapp.ui;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.text.Layout;
-import android.util.Log;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -39,13 +28,11 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Optional;
 import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Step;
+import timber.log.Timber;
 
-import static ralli.yugesh.com.recipesapp.ui.FullscreenDialog.*;
-import static ralli.yugesh.com.recipesapp.ui.FullscreenDialog.TAG;
+import static android.app.Activity.RESULT_OK;
 
 public class RecipeStepFragment extends Fragment {
 
@@ -53,16 +40,24 @@ public class RecipeStepFragment extends Fragment {
     @BindView(R.id.tv_stepDescription)
     TextView descriptionTextView;
 
+    @BindView(R.id.tv_stepTitle)
+    TextView titleTextView;
+
     private String stepVideoUrl;
-    private String TAG = "RecipeStepFragment";
+    private static final String CURRENT_POSITION = "current_position";
+    private static final String PLAYER_READY="Player_Ready";
 
     private PlayerView mPlayerView;
     private SimpleExoPlayer mPlayer;
 
-    private Boolean flag = false;
-    private View view;
+    private long position;
+    private boolean playWhenReady;
 
-    private boolean isPlayerPlaying;
+    private Boolean flag;
+    private View view;
+    private String stepTitle;
+    private int stepId;
+    private boolean back;
 
     public RecipeStepFragment(){
 
@@ -79,8 +74,13 @@ public class RecipeStepFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_step,container,false);
 
+        assert getArguments() != null;
         Step step = (Step) getArguments().getSerializable("steps");
+        assert step != null;
         stepVideoUrl = step.getVideoURL();
+        stepTitle = step.getShortDescription();
+        stepId = step.getId();
+
         flag = getArguments().getBoolean("flag");
 
         ButterKnife.bind(this,view);
@@ -88,17 +88,23 @@ public class RecipeStepFragment extends Fragment {
 
         if (!stepVideoUrl.equals("")){
             mPlayerView.setVisibility(View.VISIBLE);
-            initializePlayer(stepVideoUrl);
+            initializeMediaSession();
+            initializePlayer();
         }else {
+            //Video missing
             mPlayerView.setVisibility(View.GONE);
         }
 
+        titleTextView.setText(stepId+". "+stepTitle);
         descriptionTextView.setText(step.getDescription());
+
+        back = true;
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
         return view;
     }
 
-    private void initializePlayer(String stepVideoUrl) {
+    private void initializePlayer() {
         if (mPlayer == null){
             TrackSelector trackSelector = new DefaultTrackSelector();
             DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -108,70 +114,110 @@ public class RecipeStepFragment extends Fragment {
             Uri uri = Uri.parse(stepVideoUrl);
             mPlayer = ExoPlayerFactory.newSimpleInstance(getContext(),trackSelector);
             mPlayerView.setPlayer(mPlayer);
+            mPlayer.setPlayWhenReady(playWhenReady);
+            mPlayer.seekTo(position);
             //Prepare media source
             MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
             mPlayer.prepare(mediaSource);
-            mPlayer.setPlayWhenReady(true);
         }
     }
 
-    private void releasePlayer(){
-        mPlayer.stop();
-        mPlayer.release();
-        mPlayer = null;
+    private void initializeMediaSession() {
+        MediaSessionCompat mediaSessionCompat = new MediaSessionCompat(getContext(), "media");
+        mediaSessionCompat.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                        | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        mediaSessionCompat.setMediaButtonReceiver(null);
+
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY
+                                | PlaybackStateCompat.ACTION_PAUSE
+                                | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                                | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+
+        mediaSessionCompat.setPlaybackState(stateBuilder.build());
+        mediaSessionCompat.setCallback(new MediaSessionCompat.Callback() {
+
+            @Override
+            public void onPlay() {
+                mPlayer.setPlayWhenReady(true);
+
+            }
+
+            @Override
+            public void onPause() {
+                mPlayer.setPlayWhenReady(false);
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                mPlayer.seekTo(0);
+            }
+        });
+        mediaSessionCompat.setActive(true);
+    }
+
+    private void releasePlayer() {
+        if (mPlayer != null) {
+            position = mPlayer.getCurrentPosition();
+            playWhenReady=mPlayer.getPlayWhenReady();
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (!stepVideoUrl.equals("")) {
-            releasePlayer();
+        releasePlayer();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        releasePlayer();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Timber.d("onResume()");
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ){
+            Timber.d("Portrait");
         }
-    }
+        if (!flag && back && getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                if (getFragmentManager() != null) {
+                    getFragmentManager().popBackStack();
+                }
 
-    public void goToBackground(){
-        if(mPlayer != null){
-            isPlayerPlaying = mPlayer.getPlayWhenReady();
-            mPlayer.setPlayWhenReady(false);
-        }
-    }
+                long position = mPlayer.getCurrentPosition();
+                mPlayer.stop();
 
-    public void goToForeground(){
-        if(mPlayer != null){
-           mPlayer.setPlayWhenReady(isPlayerPlaying);
-        }
-    }
+                Bundle bundle = new Bundle();
+                bundle.putString("url",stepVideoUrl);
+                bundle.putLong("position",position);
 
-    private void hideSystemUi(){
-        mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN
-                |View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                |View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                |View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                |View.SYSTEM_UI_FLAG_LOW_PROFILE
-                |View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-    }
-    /*private void initFullscreenDialog() {
-
-        mFullScreenDialog = new Dialog(getActivity().getApplicationContext()) {
-            public void onBackPressed() {
-                if (mExoPlayerFullscreen)
-                    closeFullscreenDialog();
-                super.onBackPressed();
+                Intent intent = new Intent(getContext(), FullscreenActivity.class);
+                intent.putExtra("bundle",bundle);
+                startActivityForResult(intent,1);
             }
-        };
+        }
     }
 
-    private void openFullscreenDialog() {
-        ((ViewGroup)mPlayerView.getParent()).removeView(mPlayerView);
-        mFullScreenDialog.addContentView(mPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mExoPlayerFullscreen = true;
-        mFullScreenDialog.show();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1){
+            if (resultCode == RESULT_OK){
+                back = false;
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+        }
     }
-
-    private void closeFullscreenDialog() {
-        ((ViewGroup)mPlayerView.getParent()).removeView(mPlayerView);
-        ((FrameLayout) view.findViewById(R.id.frame)).addView(mPlayerView);
-        mExoPlayerFullscreen = false;
-        mFullScreenDialog.dismiss();
-    }*/
 }

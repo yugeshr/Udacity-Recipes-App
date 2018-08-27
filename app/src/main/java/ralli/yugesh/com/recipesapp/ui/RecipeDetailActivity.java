@@ -1,24 +1,18 @@
 package ralli.yugesh.com.recipesapp.ui;
 
 import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.os.Parcelable;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ScrollView;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -32,8 +26,7 @@ import ralli.yugesh.com.recipesapp.utils.StepAdapter;
 
 public class RecipeDetailActivity extends AppCompatActivity implements StepAdapter.StepAdapterOnClickHandler{
 
-    private static final String TAG = "RecipeDetailActivity";
-    private static String ACTION_RECIPEWIDGET = "ACTION_RECIPEWIDGET";
+    private static final String ACTION_RECIPEWIDGET = "ACTION_RECIPEWIDGET";
 
     @BindView(R.id.rv_recipeIngredientsView)
     RecyclerView recipeIngredientsRecyclerView;
@@ -50,6 +43,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
     private StepAdapter stepAdapter;
 
     private String mTitle;
+
     List<Ingredient> ingredientList;
     List<Step> stepList;
 
@@ -69,7 +63,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
             throw new IllegalArgumentException("Activity cannot find  extras bundle");
         }
 
+        //noinspection unchecked
         ingredientList = (List<Ingredient>) bundle.getSerializable("ingredients");
+        //noinspection unchecked
         stepList = (List<Step>) bundle.getSerializable("steps");
 
         mTitle = bundle.getString("title");
@@ -90,6 +86,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         recipeStepsRecyclerView.setLayoutManager(layoutManager);
         recipeStepsRecyclerView.setAdapter(stepAdapter);
+
     }
 
     @Override
@@ -103,16 +100,14 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
         int orientation = getResources().getConfiguration().orientation;
 
         if (orientation == Configuration.ORIENTATION_PORTRAIT ){
-            scrollView = findViewById(R.id.sv_recipedetail);
-            scrollView.setVisibility(View.INVISIBLE);
-
-            bundle.putBoolean("flag",true);
+            bundle.putBoolean("flag",false);
 
             Intent intent = new Intent(this,RecipeStepActivity.class);
             intent.putExtra("bundle",bundle);
             startActivity(intent);
 
         }else {
+            bundle.putBoolean("flag",true);
             recipeStepFragment = new RecipeStepFragment();
             recipeStepFragment.setArguments(bundle);
             fragmentManager = getSupportFragmentManager();
@@ -120,16 +115,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
                     .replace(R.id.recipeStepContainer,recipeStepFragment)
                     .commit();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT ){
-            scrollView = findViewById(R.id.sv_recipedetail);
-            scrollView.setVisibility(View.VISIBLE);
-        }
-        super.onResume();
     }
 
     @Override
@@ -151,7 +136,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
                 e.printStackTrace();
             }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -159,5 +143,13 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 }

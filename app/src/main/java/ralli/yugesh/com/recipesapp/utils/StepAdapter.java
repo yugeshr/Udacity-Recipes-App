@@ -16,8 +16,8 @@ import ralli.yugesh.com.recipesapp.model.Step;
 
 public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder> {
 
-    private List<Step> dataList;
-    private Context context;
+    private final List<Step> dataList;
+    private final Context context;
 
     private final StepAdapterOnClickHandler mClickHandler;
 
@@ -32,9 +32,9 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     }
 
     public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView stepShortDescriptionTextView;
-        TextView stepIdTextView;
-        ImageView stepOpenView;
+        final TextView stepShortDescriptionTextView;
+        final TextView stepIdTextView;
+        final ImageView stepOpenView;
 
         public StepViewHolder(View itemView) {
             super(itemView);

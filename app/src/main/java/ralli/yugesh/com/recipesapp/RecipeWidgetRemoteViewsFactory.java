@@ -3,9 +3,6 @@ package ralli.yugesh.com.recipesapp;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
-import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -16,11 +13,12 @@ import ralli.yugesh.com.recipesapp.model.Ingredient;
 public class RecipeWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private final String TAG = "RecipeWidgetRemoteViews";
-    private Context mContext;
-    private List<Ingredient> list;
-    private Bundle bundle;
-    private int appWidgetId;
+    private final Context mContext;
+    private final List<Ingredient> list;
+    private final Bundle bundle;
+    private final int appWidgetId;
 
+    @SuppressWarnings("unchecked")
     public RecipeWidgetRemoteViewsFactory(Context mContext, Intent intent) {
 
         appWidgetId=intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);

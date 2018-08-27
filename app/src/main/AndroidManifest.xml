@@ -18,8 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.RecipeDetailActivity" />
-        <activity android:name=".ui.RecipeStepActivity" />
+        <activity android:name=".ui.RecipeDetailActivity"
+            android:configChanges="orientation"/>
+        <activity android:name=".ui.RecipeStepActivity"
+            android:configChanges="orientation" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -36,8 +38,13 @@
         </receiver>
 
         <service
-            android:name="RecipeWidgetRemoteViewsService"
+            android:name=".RecipeWidgetRemoteViewsService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <activity android:name=".ui.FullscreenActivity"
+            android:screenOrientation="landscape">
+
+        </activity>
     </application>
 
 </manifest>

@@ -1,29 +1,21 @@
 package ralli.yugesh.com.recipesapp;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 
-import java.util.List;
 import java.util.Random;
-
-import ralli.yugesh.com.recipesapp.model.Ingredient;
-import ralli.yugesh.com.recipesapp.ui.RecipeDetailActivity;
-import ralli.yugesh.com.recipesapp.ui.RecipeListActivity;
 
 /**
  * Implementation of App Widget functionality.
  */
 public class RecipeWidgetProvider extends AppWidgetProvider {
 
-    private static String ACTION_RECIPEWIDGET = "ACTION_RECIPEWIDGET";
+    private static final String ACTION_RECIPEWIDGET = "ACTION_RECIPEWIDGET";
     private String TAG = "RecipeWidgetProvider";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,

@@ -13,7 +13,7 @@
         android:layout_margin="8dp"
         android:textColor="#ffffff"
         android:textSize="24sp"
-        android:text="RecipeName"
+        android:text="@string/recipename"
         tools:text="Nutella Pie"/>
 
     <ListView

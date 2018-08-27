@@ -14,8 +14,8 @@ import ralli.yugesh.com.recipesapp.model.Ingredient;
 
 public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.IngredientViewHolder> {
 
-    private List<Ingredient> dataList;
-    private Context context;
+    private final List<Ingredient> dataList;
+    private final Context context;
 
     public IngredientAdapter( Context context,List<Ingredient> dataList) {
         this.dataList = dataList;
@@ -23,7 +23,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
     }
 
     public class IngredientViewHolder extends RecyclerView.ViewHolder {
-        TextView ingredientTextView;
+        final TextView ingredientTextView;
         public IngredientViewHolder(View itemView) {
             super(itemView);
             ingredientTextView = itemView.findViewById(R.id.tv_ingredient);

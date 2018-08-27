@@ -2,12 +2,13 @@ package ralli.yugesh.com.recipesapp.ui;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import java.io.Serializable;
 import java.util.List;
@@ -24,6 +25,7 @@ import ralli.yugesh.com.recipesapp.utils.RecipeAdapter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 
 public class RecipeListActivity extends AppCompatActivity implements RecipeAdapter.RecipeAdapterOnClickHandler{
@@ -32,9 +34,9 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
     RecyclerView recipesRecyclerView;
 
     private RecipeAdapter recipeAdapter;
-    private String TAG = "Log";
 
     Bundle bundle;
+    private RelativeLayout relativeLayout;
 
 
     @Override
@@ -43,6 +45,7 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
         setContentView(R.layout.activity_recipe_list);
 
         ButterKnife.bind(this);
+        relativeLayout = findViewById(R.id.relativeLayout);
 
         getRecipes();
     }
@@ -59,8 +62,16 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
 
             @Override
             public void onFailure(Call<List<RecipeList>> call, Throwable t) {
-                Log.d(TAG,t.getMessage());
-                Toast.makeText(getApplicationContext(),"Error Occurred, Try again later!",Toast.LENGTH_LONG).show();
+                Timber.d(t);
+                Snackbar snackbar = Snackbar.make(relativeLayout,"Internet not working!",Snackbar.LENGTH_INDEFINITE)
+                        .setAction("RETRY", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                startActivity(new Intent(RecipeListActivity.this,RecipeListActivity.class));
+                                finish();
+                            }
+                        });
+                snackbar.show();
             }
         });
     }
@@ -91,6 +102,5 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
     @Override
     public void onSaveInstanceState(@NonNull Bundle currentState) {
         super.onSaveInstanceState(currentState);
-
     }
 }

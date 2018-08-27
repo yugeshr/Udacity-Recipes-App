@@ -18,8 +18,8 @@ import ralli.yugesh.com.recipesapp.model.RecipeList;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>{
 
-    private List<RecipeList> dataList;
-    private Context context;
+    private final List<RecipeList> dataList;
+    private final Context context;
 
     private final RecipeAdapterOnClickHandler mClickHandler;
 
@@ -34,9 +34,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView recipeNameTextView;
-        TextView recipeServingTextView;
-        ImageView iconImageView;
+        final TextView recipeNameTextView;
+        final TextView recipeServingTextView;
+        final ImageView iconImageView;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);

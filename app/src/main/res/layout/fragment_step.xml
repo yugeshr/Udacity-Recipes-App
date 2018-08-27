@@ -8,7 +8,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/tv_stepTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:textColor="@color/colorBlack"
+            android:background="@color/colorPrimaryLight"/>
+
         <FrameLayout
+            android:layout_below="@id/tv_stepTitle"
             android:id="@+id/frame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
