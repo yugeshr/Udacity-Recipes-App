@@ -1,24 +1,15 @@
 package ralli.yugesh.com.recipesapp.ui;
 
-import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import ralli.yugesh.com.recipesapp.R;
+import ralli.yugesh.com.recipesapp.utils.ExoPlayerVideoHandler;
 
 public class FullscreenActivity extends AppCompatActivity {
 
@@ -28,6 +19,9 @@ public class FullscreenActivity extends AppCompatActivity {
     private String stepVideoUrl;
     private long position;
 
+    private boolean destroyVideo = true;
+    private boolean playerReady = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +30,10 @@ public class FullscreenActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getBundleExtra("bundle");
         stepVideoUrl = bundle.getString("url");
         position = bundle.getLong("position");
+        playerReady = bundle.getBoolean("state");
 
         mPlayerView = findViewById(R.id.exoPlayerView);
-        initializePlayer(stepVideoUrl,position);
+        initializePlayer();
         hideUi();
     }
 
@@ -50,42 +45,50 @@ public class FullscreenActivity extends AppCompatActivity {
                 |View.SYSTEM_UI_FLAG_LOW_PROFILE);
     }
 
-    private void initializePlayer(String stepVideoUrl, long position) {
+    private void initializePlayer() {
         if (mPlayer == null){
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getApplicationContext(),
-                    Util.getUserAgent(getApplicationContext(), "RecipesApp"), bandwidthMeter);
-
-            Uri uri = Uri.parse(stepVideoUrl);
-            mPlayer = ExoPlayerFactory.newSimpleInstance(getApplicationContext(),trackSelector);
-            mPlayerView.setPlayer(mPlayer);
-            //Prepare media source
-            MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            mPlayer.prepare(mediaSource);
-            mPlayer.setPlayWhenReady(true);
-            mPlayer.seekTo(position);
+            ExoPlayerVideoHandler.getInstance()
+                    .prepareExoPlayerForUri(getApplicationContext(),
+                            Uri.parse(stepVideoUrl), mPlayerView,playerReady);
+            ExoPlayerVideoHandler.getInstance().goToForeground();
+            ExoPlayerVideoHandler.getInstance().goToPosition(position);
         }
     }
 
-    private void releasePlayer(){
-        mPlayer.stop();
-        mPlayer.release();
-        mPlayer = null;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ExoPlayerVideoHandler.getInstance()
+                .prepareExoPlayerForUri(getApplicationContext(),
+                        Uri.parse(stepVideoUrl), mPlayerView,playerReady);
+        ExoPlayerVideoHandler.getInstance().goToForeground();
+        ExoPlayerVideoHandler.getInstance().goToPosition(position);
+        (findViewById(R.id.exo_fullscreen)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                destroyVideo = false;
+                finish();
+            }
+        });
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (!stepVideoUrl.equals("")) {
-            releasePlayer();
-        }
+        ExoPlayerVideoHandler.getInstance().goToBackground();
     }
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent();
-        setResult(RESULT_OK, intent);
-        finish();
+        destroyVideo = false;
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(destroyVideo){
+            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
+        }
     }
 }

@@ -14,25 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Step;
-import timber.log.Timber;
-
-import static android.app.Activity.RESULT_OK;
+import ralli.yugesh.com.recipesapp.utils.ExoPlayerVideoHandler;
 
 public class RecipeStepFragment extends Fragment {
 
@@ -43,21 +31,18 @@ public class RecipeStepFragment extends Fragment {
     @BindView(R.id.tv_stepTitle)
     TextView titleTextView;
 
-    @BindView(R.id.btn_previous)
-    Button btnPrevious;
-
-    @BindView(R.id.btn_next)
-    Button btnNext;
+    @BindView(R.id.exo_fullscreen)
+    Button fullscreen;
 
     private String stepVideoUrl;
     private static final String CURRENT_POSITION = "current_position";
     private static final String PLAYER_READY="Player_Ready";
 
     private PlayerView mPlayerView;
-    private SimpleExoPlayer mPlayer;
 
     private long position;
     private boolean playWhenReady;
+    private boolean destroyVideo = true;
 
     private Boolean flag;
     private View view;
@@ -65,6 +50,8 @@ public class RecipeStepFragment extends Fragment {
     private int stepId;
     private boolean back;
     private int stepSize;
+    private long playerPosition;
+    private boolean getPlayerWhenReady;
 
     public RecipeStepFragment(){
 
@@ -92,7 +79,7 @@ public class RecipeStepFragment extends Fragment {
         flag = getArguments().getBoolean("flag");
 
         ButterKnife.bind(this,view);
-        mPlayerView = view.findViewById(R.id.exoPlayerView);
+        mPlayerView = (PlayerView) view.findViewById(R.id.playerView);
 
         if (!stepVideoUrl.equals("")){
             mPlayerView.setVisibility(View.VISIBLE);
@@ -108,107 +95,107 @@ public class RecipeStepFragment extends Fragment {
         back = true;
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
 
-        if (stepId==stepSize-1){
-            btnNext.setVisibility(View.GONE);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            Button btnPrevious = view.findViewById(R.id.btn_previous);
+            Button btnNext = view.findViewById(R.id.btn_next);
+
+            btnNext.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((RecipeStepActivity) getActivity()).setCurrentItem(stepId+1,true);
+                }
+            });
+
+            if (stepId==stepSize-1){
+                btnNext.setVisibility(View.GONE);
+            }
+
+            if (stepId==0){
+                btnPrevious.setVisibility(View.GONE);
+            }
+
+            btnPrevious.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((RecipeStepActivity) getActivity()).setCurrentItem(stepId-1,true);
+                }
+            });
         }
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
+        fullscreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((RecipeStepActivity) getActivity()).setCurrentItem(stepId+1,true);
+                Bundle bundle = new Bundle();
+                bundle.putString("url",stepVideoUrl);
+                bundle.putLong("position",playerPosition);
+                bundle.putBoolean("state",getPlayerWhenReady);
+
+                Intent intent = new Intent(getContext(), FullscreenActivity.class);
+                intent.putExtra("bundle",bundle);
+                startActivity(intent);
             }
         });
 
-        if (stepId==0){
-            btnPrevious.setVisibility(View.GONE);
-        }
-
-        btnPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((RecipeStepActivity) getActivity()).setCurrentItem(stepId-1,true);
-            }
-        });
         return view;
     }
 
     private void initializePlayer() {
-        if (mPlayer == null){
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getContext(),
-                    Util.getUserAgent(getContext(), "RecipesApp"), bandwidthMeter);
-
-            Uri uri = Uri.parse(stepVideoUrl);
-            mPlayer = ExoPlayerFactory.newSimpleInstance(getContext(),trackSelector);
-            mPlayerView.setPlayer(mPlayer);
-            mPlayer.setPlayWhenReady(playWhenReady);
-            mPlayer.seekTo(position);
-            //Prepare media source
-            MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
-            mPlayer.prepare(mediaSource);
-        }
-    }
-
-    private void releasePlayer() {
-        if (mPlayer != null) {
-            position = mPlayer.getCurrentPosition();
-            playWhenReady=mPlayer.getPlayWhenReady();
-            mPlayer.stop();
-            mPlayer.release();
-            mPlayer = null;
+        if (ExoPlayerVideoHandler.getInstance() == null){
+            ExoPlayerVideoHandler.getInstance()
+                    .prepareExoPlayerForUri(getContext(),
+                            Uri.parse(stepVideoUrl), mPlayerView, getPlayerWhenReady);
+            ExoPlayerVideoHandler.getInstance().goToForeground();
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
-
+        ExoPlayerVideoHandler.getInstance().goToBackground();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        releasePlayer();
-
+    public void onDestroyView() {
+        ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
+        super.onDestroyView();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Timber.d("onResume()");
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ){
-            Timber.d("Portrait");
-        }
-        if (!flag && back && getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                if (getFragmentManager() != null) {
-                    getFragmentManager().popBackStack();
-                }
+        ExoPlayerVideoHandler.getInstance()
+                .prepareExoPlayerForUri(getContext(),
+                        Uri.parse(stepVideoUrl), mPlayerView,getPlayerWhenReady);
+        ExoPlayerVideoHandler.getInstance().goToPosition(playerPosition);
+        ExoPlayerVideoHandler.getInstance().goToForeground();
+    }
 
-                long position = mPlayer.getCurrentPosition();
-                mPlayer.stop();
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        playerPosition = ExoPlayerVideoHandler.getInstance().getCurrentPosition();
+        outState.putLong(CURRENT_POSITION, playerPosition );
 
-                Bundle bundle = new Bundle();
-                bundle.putString("url",stepVideoUrl);
-                bundle.putLong("position",position);
+        getPlayerWhenReady = ExoPlayerVideoHandler.getInstance().getPlayWhenReady();
+        outState.putBoolean(PLAYER_READY, getPlayerWhenReady);
 
-                Intent intent = new Intent(getContext(), FullscreenActivity.class);
-                intent.putExtra("bundle",bundle);
-                startActivityForResult(intent,1);
-            }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null){
+            playerPosition = savedInstanceState.getLong(CURRENT_POSITION);
+            getPlayerWhenReady = savedInstanceState.getBoolean(PLAYER_READY);
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1){
-            if (resultCode == RESULT_OK){
-                back = false;
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            playerPosition = savedInstanceState.getLong(CURRENT_POSITION);
+            getPlayerWhenReady = savedInstanceState.getBoolean(PLAYER_READY);
         }
     }
+
 }

@@ -8,6 +8,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.Toolbar>
+
         <TextView
             android:id="@+id/tv_stepTitle"
             android:layout_width="match_parent"
@@ -23,8 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.exoplayer2.ui.SimpleExoPlayerView
-                android:id="@+id/exoPlayerView"
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/playerView"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="10dp"

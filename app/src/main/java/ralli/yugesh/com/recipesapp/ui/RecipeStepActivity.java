@@ -59,6 +59,10 @@ public class RecipeStepActivity extends FragmentActivity {
         //tabLayout.setupWithViewPager(viewPager);
     }
 
+
+
+
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
