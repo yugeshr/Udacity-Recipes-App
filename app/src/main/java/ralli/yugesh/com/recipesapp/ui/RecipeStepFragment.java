@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ui.PlayerView;
 
 import butterknife.BindView;
@@ -37,17 +38,19 @@ public class RecipeStepFragment extends Fragment {
     ImageButton fullscreen;
 
     private String stepVideoUrl;
-    private static final String CURRENT_POSITION = "current_position";
-    private static final String PLAYER_READY="Player_Ready";
+    private static final String KEY_WINDOW = "window";
+    private static final String KEY_POSITION = "position";
+    private static final String KEY_AUTO_PLAY = "auto_play";
 
     private PlayerView mPlayerView;
 
     private Boolean flag;
     private int stepId;
     private boolean back;
-    private long playerPosition;
-    private boolean getPlayerWhenReady;
     private String TAG = "FragmentStep";
+    private boolean startAutoPlay;
+    private int startWindow;
+    private long startPosition;
 
     public RecipeStepFragment(){
 
@@ -123,8 +126,8 @@ public class RecipeStepFragment extends Fragment {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString("url",stepVideoUrl);
-                bundle.putLong("position",playerPosition);
-                bundle.putBoolean("state",getPlayerWhenReady);
+                bundle.putLong("position",startPosition);
+                bundle.putBoolean("state",startAutoPlay);
 
                 Intent intent = new Intent(getContext(), FullscreenActivity.class);
                 intent.putExtra("bundle",bundle);
@@ -132,15 +135,30 @@ public class RecipeStepFragment extends Fragment {
             }
         });
 
+        if (savedInstanceState != null) {
+            startAutoPlay = savedInstanceState.getBoolean(KEY_AUTO_PLAY);
+            startWindow = savedInstanceState.getInt(KEY_WINDOW);
+            startPosition = savedInstanceState.getLong(KEY_POSITION);
+        }else {
+            clearStartPosition();
+        }
+
         return view;
+    }
+
+    private void clearStartPosition() {
+        startAutoPlay = true;
+        startWindow = C.INDEX_UNSET;
+        startPosition = C.TIME_UNSET;
     }
 
     private void initializePlayer() {
         if (ExoPlayerVideoHandler.getInstance() == null){
             ExoPlayerVideoHandler.getInstance()
                     .prepareExoPlayerForUri(getContext(),
-                            Uri.parse(stepVideoUrl), mPlayerView, getPlayerWhenReady);
+                            Uri.parse(stepVideoUrl), mPlayerView, startAutoPlay);
             ExoPlayerVideoHandler.getInstance().goToForeground();
+            ExoPlayerVideoHandler.getInstance().goToPosition(startPosition);
         }
     }
 
@@ -148,6 +166,7 @@ public class RecipeStepFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (Build.VERSION.SDK_INT<=23){
+            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
             ExoPlayerVideoHandler.getInstance().goToBackground();
         }
     }
@@ -156,6 +175,7 @@ public class RecipeStepFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if (Build.VERSION.SDK_INT > 23){
+            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
             ExoPlayerVideoHandler.getInstance().goToBackground();
         }
     }
@@ -165,36 +185,24 @@ public class RecipeStepFragment extends Fragment {
         super.onResume();
         ExoPlayerVideoHandler.getInstance()
                 .prepareExoPlayerForUri(getContext(),
-                        Uri.parse(stepVideoUrl), mPlayerView,getPlayerWhenReady);
-        ExoPlayerVideoHandler.getInstance().goToPosition(playerPosition);
+                        Uri.parse(stepVideoUrl), mPlayerView,startAutoPlay);
+        ExoPlayerVideoHandler.getInstance().goToPosition(startPosition);
         ExoPlayerVideoHandler.getInstance().goToForeground();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        playerPosition = ExoPlayerVideoHandler.getInstance().getCurrentPosition();
-        outState.putLong(CURRENT_POSITION, playerPosition );
-
-        getPlayerWhenReady = ExoPlayerVideoHandler.getInstance().getPlayWhenReady();
-        outState.putBoolean(PLAYER_READY, getPlayerWhenReady);
-
+        updateStartPosition();
+        outState.putBoolean(KEY_AUTO_PLAY, startAutoPlay);
+        outState.putInt(KEY_WINDOW, startWindow);
+        outState.putLong(KEY_POSITION, startPosition);
     }
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null){
-            playerPosition = savedInstanceState.getLong(CURRENT_POSITION);
-            getPlayerWhenReady = savedInstanceState.getBoolean(PLAYER_READY);
-        }
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            playerPosition = savedInstanceState.getLong(CURRENT_POSITION);
-            getPlayerWhenReady = savedInstanceState.getBoolean(PLAYER_READY);
+    private void updateStartPosition() {
+        if (ExoPlayerVideoHandler.getInstance().getPlayer() != null) {
+            startAutoPlay = ExoPlayerVideoHandler.getInstance().getPlayer().getPlayWhenReady();
+            startWindow = ExoPlayerVideoHandler.getInstance().getPlayer().getCurrentWindowIndex();
+            startPosition = Math.max(0, ExoPlayerVideoHandler.getInstance().getPlayer().getContentPosition());
         }
     }
 }

@@ -56,7 +56,7 @@ public class RecipeStepActivity extends AppCompatActivity {
         pagerAdapter = new StepStatePagerAdapter(getSupportFragmentManager(),stepList,flag);
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(selectedStep.getId());
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(1);
     }
 
 

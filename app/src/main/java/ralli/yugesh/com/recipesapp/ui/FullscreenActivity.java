@@ -1,6 +1,7 @@
 package ralli.yugesh.com.recipesapp.ui;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -75,20 +76,24 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        ExoPlayerVideoHandler.getInstance().goToBackground();
+        if (Build.VERSION.SDK_INT<=23){
+            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
+            ExoPlayerVideoHandler.getInstance().goToBackground();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Build.VERSION.SDK_INT > 23){
+            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
+            ExoPlayerVideoHandler.getInstance().goToBackground();
+        }
     }
 
     @Override
     public void onBackPressed() {
         destroyVideo = false;
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(destroyVideo){
-            ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
-        }
     }
 }

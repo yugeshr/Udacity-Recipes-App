@@ -93,4 +93,8 @@ public class ExoPlayerVideoHandler {
     public Boolean getPlayWhenReady(){
         return player.getPlayWhenReady();
     }
+
+    public SimpleExoPlayer getPlayer(){
+        return player;
+    }
 }
