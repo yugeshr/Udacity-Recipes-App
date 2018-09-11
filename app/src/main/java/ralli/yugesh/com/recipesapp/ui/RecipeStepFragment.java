@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -32,7 +33,7 @@ public class RecipeStepFragment extends Fragment {
     TextView titleTextView;
 
     @BindView(R.id.exo_fullscreen)
-    Button fullscreen;
+    ImageButton fullscreen;
 
     private String stepVideoUrl;
     private static final String CURRENT_POSITION = "current_position";

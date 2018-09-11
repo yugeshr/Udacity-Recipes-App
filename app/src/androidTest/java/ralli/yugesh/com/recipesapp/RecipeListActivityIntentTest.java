@@ -28,6 +28,7 @@ public class RecipeListActivityIntentTest {
 
     @Test
     public void clickRecipeDetailsActivityIntent() {
+
         Espresso.onView(ViewMatchers.withId(R.id.rv_recipesView))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
         intended(
