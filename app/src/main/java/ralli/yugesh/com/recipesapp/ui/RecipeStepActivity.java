@@ -1,10 +1,13 @@
 package ralli.yugesh.com.recipesapp.ui;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.List;
 
@@ -15,7 +18,7 @@ import ralli.yugesh.com.recipesapp.model.Step;
 import ralli.yugesh.com.recipesapp.utils.StepStatePagerAdapter;
 import timber.log.Timber;
 
-public class RecipeStepActivity extends FragmentActivity {
+public class RecipeStepActivity extends AppCompatActivity {
 
     private static final String BUNDLE_TEXT = "bundle";
     private PagerAdapter pagerAdapter;
@@ -23,10 +26,8 @@ public class RecipeStepActivity extends FragmentActivity {
     @BindView(R.id.viewpager)
     ViewPager viewPager;
 
-/*    @BindView(R.id.tabs)
-    TabLayout tabLayout;*/
-
-
+    @SuppressLint("ResourceType")
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +57,7 @@ public class RecipeStepActivity extends FragmentActivity {
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(selectedStep.getId());
         viewPager.setOffscreenPageLimit(3);
-        //tabLayout.setupWithViewPager(viewPager);
     }
-
-
-
 
 
     @Override

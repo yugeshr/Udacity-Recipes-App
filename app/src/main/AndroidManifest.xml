@@ -19,9 +19,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.RecipeDetailActivity"
-            android:configChanges="orientation"/>
+            android:parentActivityName=".ui.RecipeListActivity"/>
+
         <activity android:name=".ui.RecipeStepActivity"
-            android:configChanges="orientation" />
+            android:parentActivityName=".ui.RecipeListActivity"/>
 
         <meta-data
             android:name="preloaded_fonts"

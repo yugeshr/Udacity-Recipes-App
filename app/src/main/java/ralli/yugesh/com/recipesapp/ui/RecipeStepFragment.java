@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -41,18 +42,12 @@ public class RecipeStepFragment extends Fragment {
 
     private PlayerView mPlayerView;
 
-    private long position;
-    private boolean playWhenReady;
-    private boolean destroyVideo = true;
-
     private Boolean flag;
-    private View view;
-    private String stepTitle;
     private int stepId;
     private boolean back;
-    private int stepSize;
     private long playerPosition;
     private boolean getPlayerWhenReady;
+    private String TAG = "FragmentStep";
 
     public RecipeStepFragment(){
 
@@ -67,19 +62,19 @@ public class RecipeStepFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_step,container,false);
+        View view = inflater.inflate(R.layout.fragment_step, container, false);
 
         assert getArguments() != null;
         Step step = (Step) getArguments().getSerializable("steps");
         assert step != null;
         stepVideoUrl = step.getVideoURL();
-        stepTitle = step.getShortDescription();
+        String stepTitle = step.getShortDescription();
         stepId = step.getId();
 
-        stepSize = getArguments().getInt("size");
+        int stepSize = getArguments().getInt("size");
         flag = getArguments().getBoolean("flag");
 
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
         mPlayerView = (PlayerView) view.findViewById(R.id.playerView);
 
         if (!stepVideoUrl.equals("")){
@@ -90,7 +85,7 @@ public class RecipeStepFragment extends Fragment {
             mPlayerView.setVisibility(View.GONE);
         }
 
-        titleTextView.setText(stepId+". "+stepTitle);
+        titleTextView.setText(stepId+". "+ stepTitle);
         descriptionTextView.setText(step.getDescription());
 
         back = true;
@@ -107,7 +102,7 @@ public class RecipeStepFragment extends Fragment {
                 }
             });
 
-            if (stepId==stepSize-1){
+            if (stepId== stepSize -1){
                 btnNext.setVisibility(View.GONE);
             }
 
@@ -152,13 +147,17 @@ public class RecipeStepFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        ExoPlayerVideoHandler.getInstance().goToBackground();
+        if (Build.VERSION.SDK_INT<=23){
+            ExoPlayerVideoHandler.getInstance().goToBackground();
+        }
     }
 
     @Override
-    public void onDestroyView() {
-        ExoPlayerVideoHandler.getInstance().releaseVideoPlayer();
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
+        if (Build.VERSION.SDK_INT > 23){
+            ExoPlayerVideoHandler.getInstance().goToBackground();
+        }
     }
 
     @Override
@@ -198,5 +197,4 @@ public class RecipeStepFragment extends Fragment {
             getPlayerWhenReady = savedInstanceState.getBoolean(PLAYER_READY);
         }
     }
-
 }

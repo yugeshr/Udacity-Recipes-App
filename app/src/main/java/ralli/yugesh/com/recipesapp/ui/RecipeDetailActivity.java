@@ -6,13 +6,11 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ScrollView;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,8 +33,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
 
     @BindView(R.id.rv_recipeStepsView)
     RecyclerView recipeStepsRecyclerView;
-
-    ScrollView scrollView;
 
     private FragmentManager fragmentManager;
     private RecipeStepFragment  recipeStepFragment;
@@ -74,9 +70,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements StepAdapt
         setTitle(mTitle);
         setIngredients(ingredientList);
         setSteps(stepList);
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setIngredients(List<Ingredient> ingredientList) {
