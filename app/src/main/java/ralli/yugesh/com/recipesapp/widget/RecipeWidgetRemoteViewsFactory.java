@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.widget.RemoteViewsService;
 
 import java.util.List;
 
+import ralli.yugesh.com.recipesapp.R;
 import ralli.yugesh.com.recipesapp.model.Ingredient;
 
 public class RecipeWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -54,7 +55,7 @@ public class RecipeWidgetRemoteViewsFactory implements RemoteViewsService.Remote
         String ingredientString = list.get(position).getIngredient()
                 +"("+list.get(position).getQuantity()+" "+list.get(position).getMeasure()+")";
 
-        RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(),R.layout.widget_ingredients_list_item);
+        RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.widget_ingredients_list_item);
         remoteViews.setTextViewText(R.id.widget_ingredient_name,ingredientString);
 
         return remoteViews;

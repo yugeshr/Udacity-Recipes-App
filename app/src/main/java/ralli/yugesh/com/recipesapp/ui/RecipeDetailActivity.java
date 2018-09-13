@@ -18,7 +18,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ralli.yugesh.com.recipesapp.R;
-import ralli.yugesh.com.recipesapp.RecipeWidgetProvider;
+import ralli.yugesh.com.recipesapp.widget.RecipeWidgetProvider;
 import ralli.yugesh.com.recipesapp.model.Ingredient;
 import ralli.yugesh.com.recipesapp.model.Step;
 import ralli.yugesh.com.recipesapp.utils.IngredientAdapter;

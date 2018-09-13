@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.widget;
 
 import android.content.Intent;
 import android.widget.RemoteViewsService;

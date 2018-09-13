@@ -1,7 +1,6 @@
 package ralli.yugesh.com.recipesapp.ui;
 
 import android.annotation.SuppressLint;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -57,15 +56,7 @@ public class RecipeStepActivity extends AppCompatActivity {
         viewPager.setAdapter(pagerAdapter);
         viewPager.setCurrentItem(selectedStep.getId());
         viewPager.setOffscreenPageLimit(1);
-    }
 
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            //tabLayout.setVisibility(View.GONE);
-        }
     }
 
     public void setCurrentItem (int item, boolean smoothScroll) {

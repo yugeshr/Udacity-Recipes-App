@@ -183,11 +183,21 @@ public class RecipeStepFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ExoPlayerVideoHandler.getInstance()
-                .prepareExoPlayerForUri(getContext(),
-                        Uri.parse(stepVideoUrl), mPlayerView,startAutoPlay);
-        ExoPlayerVideoHandler.getInstance().goToPosition(startPosition);
-        ExoPlayerVideoHandler.getInstance().goToForeground();
+        if ((Build.VERSION.SDK_INT <= 23 || ExoPlayerVideoHandler.getInstance().getPlayer() == null)) {
+            ExoPlayerVideoHandler.getInstance()
+                    .prepareExoPlayerForUri(getContext(),
+                            Uri.parse(stepVideoUrl), mPlayerView, startAutoPlay);
+            ExoPlayerVideoHandler.getInstance().goToPosition(startPosition);
+            ExoPlayerVideoHandler.getInstance().goToForeground();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(Build.VERSION.SDK_INT > 23){
+            initializePlayer();
+        }
     }
 
     @Override

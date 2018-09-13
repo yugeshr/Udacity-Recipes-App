@@ -1,4 +1,4 @@
-package ralli.yugesh.com.recipesapp;
+package ralli.yugesh.com.recipesapp.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import java.util.Random;
+
+import ralli.yugesh.com.recipesapp.R;
 
 /**
  * Implementation of App Widget functionality.
